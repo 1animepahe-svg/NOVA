@@ -4,7 +4,7 @@
    ===================================================================== */
 
 /* ---------- 1. Settings you may want to change ---------- */
-const GEMINI_MODEL = 'gemini-flash-latest';        // Google Gemini model (free tier)
+const GEMINI_MODEL = 'gemini-2.5-flash-lite';        // Google Gemini model (free tier)
 const GROQ_MODEL = 'openai/gpt-oss-120b';      // Groq backup model (free tier)
 const STORE_KEY = 'nova.data.v1';                  // where data is saved in the browser
 const HISTORY_SENT = 16;                           // how many recent messages are sent as context
