@@ -1,0 +1,21 @@
+{
+  "name": "Hark — Personal AI Assistant",
+  "short_name": "Hark",
+  "description": "Your personal AI assistant. Research, shopping, travel, bookings, creative work and more. 100% free.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#08080c",
+  "theme_color": "#08080c",
+  "lang": "en",
+  "categories": ["productivity", "utilities", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

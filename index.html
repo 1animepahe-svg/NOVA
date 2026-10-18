@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="Hark — Your personal AI assistant. Research, shopping, travel, bookings, creative work and more. 100% free." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Hark" />
+  <title>Hark — Your Personal AI Assistant</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Markdown & Code Highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs@11.9.0/styles/atom-one-dark.min.css" />
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
+</head>
+<body>
+  <!-- App Root -->
+  <div id="app">
+
+    <!-- ====================== SIDEBAR ====================== -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-wrap">
+          <img src="icon.svg" alt="Hark" class="logo-icon" />
+          <span class="logo-text">hark</span>
+        </div>
+        <button id="sidebar-close" class="icon-btn" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M6 18L18 6"/></svg>
+        </button>
+      </div>
+
+      <button id="new-chat-btn" class="new-chat-btn">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span>New Chat</span>
+      </button>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Home</div>
+        <button class="nav-item active" data-screen="chat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Chat</span>
+        </button>
+        <button class="nav-item" data-screen="home-panels">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Home Panels</span>
+        </button>
+        <button class="nav-item" data-screen="scheduled">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Scheduled</span>
+        </button>
+        <button class="nav-item" data-screen="projects">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Projects</span>
+        </button>
+
+        <div class="nav-section-title">History</div>
+        <div class="history-scroll" id="history-list">
+          <!-- History items injected here -->
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" data-screen="memory">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Memory</span>
+        </button>
+        <button class="nav-item" data-screen="settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+        <button class="profile-btn" id="profile-btn">
+          <div class="avatar" id="user-avatar">H</div>
+          <div class="profile-meta">
+            <div class="profile-name" id="profile-name">You</div>
+            <div class="profile-plan">Hark Pro · All features</div>
+          </div>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ====================== MAIN CONTENT ====================== -->
+    <main id="main" class="main">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button id="sidebar-toggle" class="icon-btn mobile-only" aria-label="Open sidebar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-center">
+          <div id="screen-title" class="screen-title">Chat</div>
+          <div id="project-context" class="project-context hidden"></div>
+        </div>
+        <div class="topbar-actions">
+          <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">
+            <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button id="voice-toggle" class="icon-btn" aria-label="Voice input">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ====================== CHAT SCREEN ====================== -->
+      <section id="screen-chat" class="screen active">
+        <div class="chat-area" id="chat-area">
+          <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-logo">
+              <img src="icon.svg" alt="Hark" class="welcome-icon" />
+            </div>
+            <h1 class="welcome-title">How can I help today?</h1>
+            <p class="welcome-subtitle">I can research, browse, shop, book, create and more — I'm built to do things for you.</p>
+
+            <div class="capability-grid">
+              <button class="capability-card" data-prompt="Research the best noise-cancelling headphones under $300 and compare the top 3">
+                <div class="capability-icon">🔍</div>
+                <div class="capability-label">Research & compare products</div>
+              </button>
+              <button class="capability-card" data-prompt="Help me plan a 3-day weekend trip to Kyoto, Japan">
+                <div class="capability-icon">✈️</div>
+                <div class="capability-label">Plan a trip</div>
+              </button>
+              <button class="capability-card" data-prompt="Write a professional email declining a meeting politely but warmly">
+                <div class="capability-icon">✉️</div>
+                <div class="capability-label">Draft an email</div>
+              </button>
+              <button class="capability-card" data-prompt="Build me a simple landing page for a coffee shop called 'Morning Ritual'">
+                <div class="capability-icon">🖼️</div>
+                <div class="capability-label">Make a website</div>
+              </button>
+              <button class="capability-card" data-prompt="Find subscriptions I might be overspending on and suggest cancellations">
+                <div class="capability-icon">💸</div>
+                <div class="capability-label">Save me money</div>
+              </button>
+              <button class="capability-card" data-prompt="Summarise the latest tech news from this week">
+                <div class="capability-icon">📰</div>
+                <div class="capability-label">Catch me up on news</div>
+              </button>
+              <button class="capability-card" data-prompt="Create a weekly meal plan with a shopping list for 2 people">
+                <div class="capability-icon">🥗</div>
+                <div class="capability-label">Meal plan</div>
+              </button>
+              <button class="capability-card" data-prompt="Generate an image of a cosy cabin in a snowy forest at dusk">
+                <div class="capability-icon">🎨</div>
+                <div class="capability-label">Generate an image</div>
+              </button>
+            </div>
+
+            <div class="what-i-can-do">
+              <button id="show-capabilities" class="text-btn">See everything I can do →</button>
+            </div>
+          </div>
+
+          <div class="messages" id="messages"></div>
+
+          <div class="typing-indicator" id="typing-indicator">
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="typing-text" id="typing-text">Thinking…</div>
+          </div>
+        </div>
+
+        <!-- Composer -->
+        <div class="composer-wrap">
+          <div class="composer" id="composer">
+            <button id="attach-btn" class="icon-btn composer-btn" aria-label="Attach">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <textarea id="composer-input" class="composer-input" rows="1" placeholder="Ask me anything, or tell me to do something for you…"></textarea>
+            <button id="mic-btn" class="icon-btn composer-btn" aria-label="Voice">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <button id="send-btn" class="send-btn" aria-label="Send" disabled>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="composer-hint" id="composer-hint">Hark can make mistakes. Verify important info. I won't send money or act without your go-ahead.</div>
+        </div>
+      </section>
+
+      <!-- ====================== HOME PANELS SCREEN ====================== -->
+      <section id="screen-home-panels" class="screen">
+        <div class="screen-scroll">
+          <div class="screen-header">
+            <h2>Home Panels</h2>
+            <p class="screen-desc">Live trackers right here. Add panels for prices, packages, scores, budgets and more.</p>
+          </div>
+          <div class="panels-grid" id="panels-grid">
+            <!-- Panels injected here -->
+          </div>
+          <button id="add-panel-btn" class="primary-btn">+ Add Panel</button>
+        </div>
+      </section>
+
+      <!-- ====================== SCHEDULED TASKS SCREEN ====================== -->
+      <section id="screen-scheduled" class="screen">
+        <div class="screen-scroll">
+          <div class="screen-header">
+            <h2>Scheduled Tasks</h2>
+            <p class="screen-desc">Reminders, recurring checks, daily briefings, price watches.</p>
+          </div>
+          <div class="tasks-list" id="tasks-list"></div>
+          <button id="add-task-btn" class="primary-btn">+ Schedule a Task</button>
+        </div>
+      </section>
+
+      <!-- ====================== PROJECTS SCREEN ====================== -->
+      <section id="screen-projects" class="screen">
+        <div class="screen-scroll">
+          <div class="screen-header">
+            <h2>Projects</h2>
+            <p class="screen-desc">Separate spaces for big efforts — a move, a job hunt, a wedding, anything.</p>
+          </div>
+          <div class="projects-grid" id="projects-grid"></div>
+          <button id="add-project-btn" class="primary-btn">+ New Project</button>
+        </div>
+      </section>
+
+      <!-- ====================== MEMORY SCREEN ====================== -->
+      <section id="screen-memory" class="screen">
+        <div class="screen-scroll">
+          <div class="screen-header">
+            <h2>Memory</h2>
+            <p class="screen-desc">I remember your preferences and can learn workflows. Edit, export or clear my memory here.</p>
+          </div>
+
+          <div class="memory-section">
+            <h3>About You</h3>
+            <textarea id="memory-about" class="memory-textarea" placeholder="Tell me about yourself — name, job, family, location, goals…"></textarea>
+          </div>
+
+          <div class="memory-section">
+            <h3>Preferences</h3>
+            <textarea id="memory-prefs" class="memory-textarea" placeholder="How you like things — communication style, food preferences, brands you like, routines…"></textarea>
+          </div>
+
+          <div class="memory-section">
+            <h3>Custom Workflows / Specialties</h3>
+            <textarea id="memory-workflows" class="memory-textarea" placeholder="Teach me repeatable workflows — e.g. 'When I ask for a trip plan, always include breakfast cafes and running routes.'"></textarea>
+          </div>
+
+          <div class="memory-section">
+            <h3>Learned Facts</h3>
+            <div id="learned-facts" class="learned-facts"></div>
+          </div>
+
+          <div class="memory-actions">
+            <button id="save-memory" class="primary-btn">Save Memory</button>
+            <button id="export-memory" class="secondary-btn">Export All Data</button>
+            <button id="import-btn" class="secondary-btn">Import Data</button>
+            <button id="clear-memory" class="danger-btn">Clear All Memory</button>
+            <input type="file" id="import-file" accept=".json" hidden />
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================== SETTINGS SCREEN ====================== -->
+      <section id="screen-settings" class="screen">
+        <div class="screen-scroll">
+          <div class="screen-header">
+            <h2>Settings</h2>
+            <p class="screen-desc">Hark Pro — every feature unlocked. No ads. No limits beyond what's fair.</p>
+          </div>
+
+          <div class="settings-group">
+            <h3>Plans</h3>
+            <div class="plan-cards">
+              <div class="plan-card current">
+                <div class="plan-header">
+                  <div class="plan-name">Hark Pro</div>
+                  <div class="plan-badge">You</div>
+                </div>
+                <div class="plan-price">Free</div>
+                <div class="plan-desc">Every feature. Enough for everyday research, purchases and proactive help. No ads.</div>
+              </div>
+              <div class="plan-card">
+                <div class="plan-header">
+                  <div class="plan-name">Hark Pro²</div>
+                </div>
+                <div class="plan-price">~$20/mo</div>
+                <div class="plan-desc">Same features, much more usage — handle far more each day.</div>
+              </div>
+              <div class="plan-card">
+                <div class="plan-header">
+                  <div class="plan-name">Hark Pro³</div>
+                </div>
+                <div class="plan-price">~$100/mo</div>
+                <div class="plan-desc">For leaning on me for nearly everything. Auto top-up past the allowance.</div>
+              </div>
+            </div>
+            <p class="settings-note">This app runs entirely in your browser using free AI services. No account, no billing, no servers. All features shown here work locally at zero cost.</p>
+          </div>
+
+          <div class="settings-group">
+            <h3>Appearance</h3>
+            <div class="setting-row">
+              <label>Theme</label>
+              <div class="segmented" id="theme-segment">
+                <button data-theme="dark">Dark</button>
+                <button data-theme="light">Light</button>
+                <button data-theme="auto">Auto</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>AI Model</h3>
+            <div class="setting-row">
+              <label for="model-select">Text model (free, no key needed)</label>
+              <select id="model-select" class="select-input">
+                <option value="openai">Pollinations / OpenAI (free, fast)</option>
+                <option value="openai-large">Pollinations / OpenAI Large (slower, smarter)</option>
+                <option value="claude">Claude-optimised (via Pollinations)</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label for="creativity">Creativity (temperature)</label>
+              <input type="range" id="creativity" min="0" max="2" step="0.1" value="0.7" />
+              <span class="range-val" id="creativity-val">0.7</span>
+            </div>
+            <div class="setting-row">
+              <label for="stream-toggle">Stream responses</label>
+              <input type="checkbox" id="stream-toggle" class="toggle" checked />
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Voice</h3>
+            <div class="setting-row">
+              <label for="voice-select">Voice (for reading aloud)</label>
+              <select id="voice-select" class="select-input"></select>
+            </div>
+            <div class="setting-row">
+              <label for="tts-toggle">Read responses aloud</label>
+              <input type="checkbox" id="tts-toggle" class="toggle" />
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Your Name</h3>
+            <div class="setting-row">
+              <input type="text" id="user-name-input" class="text-input" placeholder="Your name (used in conversations)" />
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>Data & Privacy</h3>
+            <p class="settings-note">Everything stays in your browser. Nothing is sent to any server except AI requests to free providers. You can export or delete all data anytime.</p>
+            <div class="setting-row buttons">
+              <button id="export-all" class="secondary-btn">Export all data</button>
+              <button id="import-all" class="secondary-btn">Import data</button>
+              <button id="delete-all" class="danger-btn">Delete everything</button>
+            </div>
+          </div>
+
+          <div class="settings-group about-section">
+            <h3>About Hark</h3>
+            <p class="about-text">Hark is your personal AI assistant, built to actually do things for you — not just chat. Research, browse, shop, book, create, remember, stay on top of life.</p>
+            <p class="about-version">Version 1.0 · Built with care for you</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Sidebar overlay for mobile -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Capabilities Modal -->
+  <div id="capabilities-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>What I can do</h2>
+        <button class="icon-btn modal-close" data-modal="capabilities-modal">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M6 18L18 6"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ol class="capabilities-list" id="capabilities-list"></ol>
+        <h3 class="wont-do-title">What I won't do</h3>
+        <ul class="wont-do-list" id="wont-do-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Modal -->
+  <div id="generic-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <button class="icon-btn modal-close" data-modal="generic-modal">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M6 18L18 6"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
