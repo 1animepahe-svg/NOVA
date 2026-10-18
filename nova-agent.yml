@@ -1,0 +1,27 @@
+name: NOVA Agent (Linux + browser)
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "What should NOVA do? e.g. Log in to X and post this Amazon product with its image: https://amzn.to/..."
+        required: true
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install browser-use && playwright install --with-deps chromium
+      - run: python agent/agent.py
+        env:
+          TASK: ${{ inputs.task }}
+          GOOGLE_API_KEY: ${{ secrets.GEMINI_KEY }}
+          X_USER: ${{ secrets.X_USER }}
+          X_PASS: ${{ secrets.X_PASS }}
+          PIN_USER: ${{ secrets.PIN_USER }}
+          PIN_PASS: ${{ secrets.PIN_PASS }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: nova-run, path: agent/out }
