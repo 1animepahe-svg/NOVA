@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install browser-use && playwright install --with-deps chromium
-      - run: python agent/agent.py
+      - run: python agent.py
         env:
           TASK: ${{ inputs.task }}
           GOOGLE_API_KEY: ${{ secrets.GEMINI_KEY }}
